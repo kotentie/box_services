@@ -23,6 +23,48 @@ html {
     line-height: 1.4;
 }
 
+table {
+    margin: 20px;
+}
+
+
+
+.service_menu {
+    width: 600px;
+    padding: 30px;
+}
+
+.table_heading {
+    width: 600px;
+    padding-bottom: 10px;
+    color: #3a3a3a;
+    padding-right: 30px;
+}
+
+.top_row {
+    border-top-style: none; 
+}
+
+.table_heading h3{
+    display: inline;
+
+
+}
+
+.table_heading p{
+    padding-left: 4px;
+    display: inline;
+
+}
+
+.price {
+    float:right
+}
+
+.service_name{
+
+}
+
 /*
  * Remove text-shadow in selection highlight: h5bp.com/i
  * These selection rule sets have to be separate.
