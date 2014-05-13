@@ -58,11 +58,12 @@ table {
 }
 
 .price {
-    float:right
+    float:right;
+    display:inline;
 }
 
 .service_name{
-
+    display:inline;
 }
 
 /*
