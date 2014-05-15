@@ -16,46 +16,15 @@
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/main.css">
 
+
         <script src="js/vendor/modernizr-2.6.2.min.js"></script>
     </head>
     <body>
     <div class="container">
         <h1>Boxc Services</h1>
     <div class="row">
-        <div class="service_menu col-md-6">
-            <div class="table_heading"> 
-                <h3>Shipping</h3> 
-                <p>(per package)</p>
-            </div>
-            <table id="ship-table" class="table table-striped">  
-                <tbody>
-                </tbody>
-            </table>
-             <div class="table_heading"> 
-                <h3>Packing</h3> 
-                <p>(per package)</p>
-            </div>
-            <table id="pack-table" class="table table-striped">
-                <tbody>
-                </tbody>
-            </table>
-             <div class="table_heading"> 
-                <h3>Warehousing</h3> 
-                <p>(per item)</p>
-            </div>
-            <table id="warehouse-table" class="table table-striped">
-                    <tbody>
-                    </tbody>
-            </table>
-            <div class="table_heading"> 
-                <h3>Returns</h3> 
-                <p>(per month)</p>
-            </div>
-            <table class="table table-striped ">
-                    <tbody>
-                    </tbody>
-            </table>
-            </div>
+        <div class="service_menu col-md-5" id="services-area">
+        </div>
 
             <div class="totals_table col-md-5">
                 <div class="table_heading"> 
@@ -78,6 +47,9 @@
                             <td><div class="service_name"><h5>Per Month</h5></div></td>
                             <td><div class="price"><h5>$13.12</h5></div></td>
                         </tr>
+                        <tr>
+                            <input type="text" id="total" value="" />
+                        </tr>
                 </table>
             </div>
         </div>
@@ -88,20 +60,65 @@
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>
 <script>
-var boxcApi = [{"ServiceCode":"C000","Option Code":"","ServiceType":"PACK","Service":"PICK & PACK","Rate":"$0.42 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C001","Option Code":"P01","ServiceType":"PACK","Service":"BOXC PACKAGING","Rate":"$0.00 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C001","Option Code":"P02","ServiceType":"PACK","Service":"YOUR PACKAGING","Rate":"$0.02 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C002","Option Code":"","ServiceType":"SHIP","Service":"IMPORT","Rate":"$1.99 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C003","Option Code":"","ServiceType":"SHIP","Service":"US DELIVERY","Rate":"$3.99 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C004","Option Code":"","ServiceType":"SHIP","Service":"INSURANCE","Rate":"$0.00 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"yes"},{"ServiceCode":"C005","Option Code":"","ServiceType":"WAREHOUSE","Service":"STORAGE","Rate":"$0.13 ","Unit":"PER SKU","Cycle":"MONTHLY","Optional":"no"},{"ServiceCode":"C006","Option Code":"","ServiceType":"WAREHOUSE","Service":"PRODUCT PHOTOS","Rate":"$5.00 ","Unit":"PER SKU","Cycle":"ONCE","Optional":"yes"}]
+var boxcApi = [{"ServiceCode":"C000","OptionCode":"","ServiceType":"PACK","Service":"PICK & PACK","Rate":"0.42 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C001","OptionCode":"P01","ServiceType":"PACK","Service":"BOXC PACKAGING","Rate":"0.00 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C001","OptionCode":"P02","ServiceType":"PACK","Service":"YOUR PACKAGING","Rate":"0.02 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C002","OptionCode":"","ServiceType":"SHIP","Service":"IMPORT","Rate":"1.99 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C003","OptionCode":"","ServiceType":"SHIP","Service":"US DELIVERY","Rate":"3.99 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},{"ServiceCode":"C004","OptionCode":"","ServiceType":"SHIP","Service":"INSURANCE","Rate":"0.00 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"yes"},{"ServiceCode":"C005","OptionCode":"","ServiceType":"WAREHOUSE","Service":"STORAGE","Rate":"0.13 ","Unit":"PER SKU","Cycle":"MONTHLY","Optional":"yes"},{"ServiceCode":"C006","OptionCode":"","ServiceType":"WAREHOUSE","Service":"PRODUCT PHOTOS","Rate":"5.00 ","Unit":"PER SKU","Cycle":"ONCE","Optional":"yes"}]
+
+var oneTimeTotal,
+    perItemTotal,
+    perShipmentTotal,
+    perMonthTotal;
+
+function sumPriceEstimate() {
+
+};
+
+function addHtml(){
+
 $.each(boxcApi, function(i, item){
-    switch(boxcApi[i].ServiceType) {
-        case "PACK":
-            $('#pack-table tbody').after('<tr><td><div class="checkbox"><input type="checkbox"></div></td><td><div class="service_name"><h5>' + boxcApi[i].Service + '</h5> </div></td><td><div class="price"><h5>' + boxcApi[i].Rate + '</h5></div></td></tr>' );
-            break;
-        case "SHIP":
-            $('#ship-table tbody').after('<tr><td><div class="checkbox"><input type="checkbox"></div></td><td><div class="service_name"><h5>' + boxcApi[i].Service + '</h5> </div></td><td><div class="price"><h5>' + boxcApi[i].Rate + '</h5></div></td></tr>' );
-            break;
-        case "WAREHOUSE":
-            $('#warehouse-table tbody').after('<tr><td><div class="checkbox"><input type="checkbox"></div></td><td><div class="service_name"><h5>' + boxcApi[i].Service + '</h5> </div></td><td><div class="price"><h5>' + boxcApi[i].Rate + '</h5></div></td></tr>' );
-            break;
+    var servicetypeClass = boxcApi[i].ServiceType.toLowerCase(),
+                           optional;
+    var servicetypeId = document.getElementById('' + servicetypeClass + '')
+    if(servicetypeId === null){
+        $('#services-area').append('<div class="table_heading" id="' + servicetypeClass + '"><h3>' + servicetypeClass + '</h3></div><table id="' + servicetypeClass + '-table" class="table table-striped"><tbody></tbody></table>')
+    }else{
+
+    } 
+    
+    if (boxcApi[i].OptionCode != ""){
+        optional = '<div class="checkbox"><input type="radio" name="' + boxcApi[i].ServiceCode + '"></div>';
     }
+
+    else if (boxcApi[i].Optional === "yes"){
+        optional = '<div class="checkbox"><input type="checkbox" name="' + boxcApi[i].ServiceCode + '" data ="' + boxcApi[i].Rate + '"></div>';
+    } 
+
+    else {
+        optional = '<div class="checkbox"><input type="checkbox" name="' + boxcApi[i].ServiceCode + '" style="display:none" value="checked" checked="checked" data ="' + boxcApi[i].Rate + '"></div><img src="img/tick.gif" alt="checkbox ticked" height="16" width="16">';
+    }
+
+
+
+     $('#' + servicetypeClass + '-table tbody').append('<tr><td>' + optional + '</td><td><div class="service_name"><h5>' + boxcApi[i].Service + ' / ' + boxcApi[i].Unit + '</h5></div></td><td><div class="price ' + boxcApi[i].Cycle + '"><h5>' + boxcApi[i].Rate + '</h5></div></td></tr>' );   
 });
-</script>
+
+};
+
+addHtml();
+
+
+
+$('input[type=checkbox]').change(function () {
+
+    var total = 0;
+    
+    $( "input:checked").each(function () {
+            var BoxValue = parseFloat($(this).attr("data"));
+
+        });
+    $('#total').val(total.toFixed(1));
+});
+
+  
+  </script>
+
     </body>
 </html>
