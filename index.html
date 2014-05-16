@@ -30,19 +30,7 @@
                 <div class="table_heading"> 
                     <h3 class="totals-title">Totals</h3> 
                 </div>
-                <table class="table table-striped ">
-                        <tr>
-                            <td><div class="service_name"><h5>One Time</h5> </div></td>
-                            <td><div class="price"><h5>$5.00</h5></div></td>
-                        </tr>
-                        <tr>
-                            <td><div class="service_name"><h5>Per Item</h5></div></td>
-                            <td><div class="price"><h5>$5.36</h5></div> </td>
-                        </tr>
-                        <tr>
-                            <td><div class="service_name"><h5>Per Month</h5></div></td>
-                            <td><div class="price"><h5>$13.12</h5></div></td>
-                        </tr>
+                <table class="table table-striped" id="totals-table">
                         <!-- <tr>
                             <input type="text" id="total" value="" />
                         </tr> -->
@@ -57,16 +45,77 @@
         <script src="js/main.js"></script>
 <script>
 
-var boxcApi = {"C000":{"Service_Code":"C000","Service_Type":"PACK","Service":"PICK & PACK","Rate":"$0.42 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},"C001":{"Service_Code":"C001","Service_Type":"PACK","Service":"BOXC PACKAGING","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no","options":[{"option":"C001-P01","name":"BOXC PACKAGING","rate":"$0.00 "},{"option":"C001-P02","name":"YOUR PACKAGING","rate":"$0.02 "},{"option":"C001-P03","name":"SUPER DUPER PACKAGING","rate":"$0.10 "}]},"C002":{"Service_Code":"C002","Service_Type":"SHIP","Service":"IMPORT","Rate":"$1.99 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},"C003":{"Service_Code":"C003","Service_Type":"SHIP","Service":"US DELIVERY","Rate":"$3.99 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},"C004":{"Service_Code":"C004","Service_Type":"SHIP","Service":"INSURANCE","Rate":"$0.00 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"yes"},"C005":{"Service_Code":"C005","Service_Type":"WAREHOUSE","Service":"STORAGE","Rate":"$0.13 ","Unit":"PER SKU","Cycle":"MONTHLY","Optional":"no"},"C006":{"Service_Code":"C006","Service_Type":"WAREHOUSE","Service":"PRODUCT PHOTOS","Rate":"$5.00 ","Unit":"PER SKU","Cycle":"ONCE","Optional":"yes"}}
+var boxcApi = {"C000":{"Service_Code":"C000","Service_Type":"PACK","Service":"PICK & PACK","Rate":"0.42 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},"C001":{"Service_Code":"C001","Service_Type":"PACK","Service":"BOXC PACKAGING","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no","options":[{"option":"C001-P01","name":"BOXC PACKAGING","rate":"0.00"},{"option":"C001-P02","name":"YOUR PACKAGING","rate":"0.02"},{"option":"C001-P03","name":"SUPER DUPER PACKAGING","rate":"0.10 "}]},"C002":{"Service_Code":"C002","Service_Type":"SHIP","Service":"IMPORT","Rate":"1.99","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},"C003":{"Service_Code":"C003","Service_Type":"SHIP","Service":"US DELIVERY","Rate":"3.99 ","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"no"},"C004":{"Service_Code":"C004","Service_Type":"SHIP","Service":"INSURANCE","Rate":"0.00","Unit":"PER ITEM","Cycle":"PER ITEM","Optional":"yes"},"C005":{"Service_Code":"C005","Service_Type":"WAREHOUSE","Service":"STORAGE","Rate":"0.13","Unit":"PER SKU","Cycle":"MONTHLY","Optional":"no"},"C006":{"Service_Code":"C006","Service_Type":"WAREHOUSE","Service":"PRODUCT PHOTOS","Rate":"5.00","Unit":"PER SKU","Cycle":"ONCE","Optional":"yes"}}
 
-var oneTimeTotal,
-    perItemTotal,
-    perShipmentTotal,
-    perMonthTotal;
+var cycleSumObj = {};
+var cycleArr = [];
 
-function sumPriceEstimate() {
+// function createArrCycle() {
+//     $.each (boxcApi, function(i, item){
+//         var theCycle =  boxcApi[i].Cycle.replace(/\s+/g, '');
+//         var theRate = parseFloat(boxcApi[i].Rate) 
+//         if (!isNaN(theRate)){
+//             if (cycleSumObj[theCycle] instanceof Array){
+//             cycleSumObj[theCycle].push(theRate);
+//             }else{
+//             alert(theRate);
+//             cycleSumObj[theCycle] = [];
+//             cycleSumObj[theCycle].push(theRate);
+//             }
+//         }
+//     });
+//     alert(cycleSumObj.toSource());
+// }
+
+
+function fillCycleArr(){
+    $.each(boxcApi, function(i, item){
+        cycleArr.push(boxcApi[i].Cycle);
+    });
+    cycleArr = $.unique(cycleArr);
+    $.each(cycleArr, function(i, item){
+        $('#totals-table').append('<tr><td><div class="service_name"><h5>' + cycleArr[i] +'</h5> </div></td><td><div class="price"><h5 id=' + cycleArr[i].replace(/\s+/g, '') +'-price></h5></div></td></tr>');
+        cycleSumObj[item] = 0;
+
+    });
+};
+
+
+function sumCycleSumObj() {
+
+  $( "input:checked").each(function () {
+           var cycle = $(this).attr("data-cycle");
+           var rate = parseFloat($(this).attr("data-rate"));
+            cycleSumObj[cycle] += rate;
+
+        });
+  
+    $.each(cycleArr, function(i, item){
+        var cycleCleaned = item.replace(/\s+/g, '')
+        $('#' + cycleCleaned + '-price' ).text('' + cycleSumObj[item] + '');
+        cycleSumObj[item] = 0;
+        });
+
 
 };
+
+
+
+
+
+
+// function sumPriceEstimate() {
+//     var total = 0;
+    
+//     $( "input:checked").each(function () {
+//            var m = $(this).attr("name");
+//             total += parseFloat($(this).attr("data"));
+
+//         });
+//     alert(total);
+//     $('#total').val(total.toFixed(1));
+
+// };
 
 function addHtml(){
 
@@ -82,9 +131,9 @@ $.each(boxcApi, function(i, item){
     
     if (boxcApi[i]['options']){
         nObjects = boxcApi[i].options.length
-        $('#' + servicetypeClass + '-table tbody').append('<tr class ="'+ servicetypeClass +'"><td><img src="img/tick.gif" alt="checkbox ticked" height="16" width="16"></td><td><div class="service_name"><h5>' + boxcApi[i].Service + '</h5></div></td><td></td></tr>');
+        $('#' + servicetypeClass + '-table tbody').append('<tr class ="'+ servicetypeClass +'"><td><img src="img/tick.gif" height="16" width="16"></td><td><div class="service_name"><h5>' + boxcApi[i].Service + '</h5></div></td><td></td></tr>');
         for (var a =0; a < nObjects; a++){
-            $('.' + servicetypeClass).after('<tr class ="multi-options"><td><div class="radio"><input type="radio" name="' + boxcApi[i].options[a].ServiceCode + '"></div></td><td><div class="sub-subservice-name"><h6>' + boxcApi[i].options[a].name  + '</h6></div></td><td><div class="price ' + boxcApi[i].Cycle + '"><h5>' + boxcApi[i].options[a].rate + boxcApi[i].Unit + '</h5></div></td></tr>')
+            $('.' + servicetypeClass).after('<tr class ="multi-options"><td><div class="radio"><input type="radio" name="' + boxcApi[i].options[a].ServiceCode + '"  data-rate="' + boxcApi[i].options[a].rate + '" data-cycle="' + boxcApi[i].Cycle + '"></div></td><td><div class="sub-subservice-name"><h6>' + boxcApi[i].options[a].name  + '</h6></div></td><td><div class="price ' + boxcApi[i].Cycle + '"><h5>' + boxcApi[i].options[a].rate + boxcApi[i].Unit + '</h5></div></td></tr>')
             
         }
 
@@ -94,16 +143,16 @@ $.each(boxcApi, function(i, item){
     else{
 
     if (boxcApi[i].Optional === "yes"){
-        optional = '<div class="checkbox"><input type="checkbox" name="' + boxcApi[i].Service_Code + '" data ="' + boxcApi[i].Rate + '"></div>';
+        optional = '<div class="checkbox"><input type="checkbox" class="checkedbox" name="' + boxcApi[i].Service_Code + '" data-rate ="' + boxcApi[i].Rate + '" data-cycle ="' + boxcApi[i].Cycle + '"></div>';
     } 
 
     else {
-        optional = '<input type="checkbox" name="' + boxcApi[i].Service_Code + '" style="display:none" value="checked" checked="checked" data ="' + boxcApi[i].Rate + '"><img src="img/tick.gif" alt="checkbox ticked" height="16" width="16">';
+        optional = '<input type="checkbox" name="' + boxcApi[i].Service_Code + '" class="checkedbox" style="display:none" value="checked" checked="checked" data-rate="' + boxcApi[i].Rate + '"data-cycle ="' + boxcApi[i].Cycle + '"><img src="img/tick.gif" alt="checkbox ticked" height="16" width="16">';
     }
 
 
 
-     $('#' + servicetypeClass + '-table tbody').append('<tr><td>' + optional + '</td><td><div class="service_name"><h5>' + boxcApi[i].Service + '</h5></div></td><td><div class="price ' + boxcApi[i].Cycle + '"><h5>' + boxcApi[i].Rate + boxcApi[i].Unit + '</h5></div></td></tr>' ); 
+     $('#' + servicetypeClass + '-table tbody').append('<tr><td>' + optional + '</td><td><div class="service_name"><h5>' + boxcApi[i].Service + '</h5></div></td><td><h5>' + boxcApi[i].Rate + boxcApi[i].Unit + '</h5></div></td></tr>' ); 
 
     }  
 });
@@ -111,18 +160,24 @@ $.each(boxcApi, function(i, item){
 };
 
 addHtml();
+fillCycleArr();
+sumCycleSumObj();
+
+$('input[type=radio]').change(function() {
+      // $('.radio').each(function () {
+      //       if($(this).is(':checked')) {
+
+      //       }
+        // });
+    sumCycleSumObj();
+    
+})
 
 
 
 $('input[type=checkbox]').change(function () {
-
-    var total = 0;
     
-    $( "input:checked").each(function () {
-            total += parseFloat($(this).attr("data"));
-
-        });
-    $('#total').val(total.toFixed(1));
+    sumCycleSumObj();
 });
 
   
