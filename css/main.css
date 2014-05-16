@@ -28,6 +28,28 @@ table {
 }
 
 
+.radio {
+    float:right;
+}
+
+.multi-options td {
+    background-color: white !important;
+    border-top-color: white !important;
+
+}
+
+.totals-title{
+    padding-left: 20px;
+
+}
+
+.totals_table {
+    padding-top: 30px;
+}
+
+.sub-subservice-name{
+    padding-left: 30px;
+}
 
 .service_menu {
     width: 600px;
